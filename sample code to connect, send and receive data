@@ -1,0 +1,53 @@
+using System;
+using System.Net;  //declaration of namespaces that will be used in this program
+using System.Net.Sockets;
+using System.Text;
+
+class MainClass
+{
+    public static void Main()
+    {
+        IPAddress host = IPAddress.Parse("192.168.1.215"); //enter the IP address of the device to be controlled
+        IPEndPoint hostep = new IPEndPoint(host, 5900); //enter the port number of the device to be controlled
+        Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp); //creating the socket
+
+        try
+        {
+            sock.Connect(hostep);  //connecting to the device
+        }
+        catch (SocketException e)
+        {
+            Console.WriteLine("Problem connecting to host");
+            Console.WriteLine(e.ToString());
+            sock.Close();
+            return;
+        }
+
+        try
+        {
+            sock.Send(Encoding.UTF8.GetBytes("*IDN?\r\n")); //enter the command that we want to send to the device. Please add ‘\r\n’ to the command for proper termination.
+
+            byte[] t = new byte[1024]; //array to store the data received
+           
+            int k = sock.Receive(t);   //to read data from the socket
+            Console.WriteLine(k);
+            Console.WriteLine("Recieved...");
+            for (int i = 0; i < k; i++)
+            {
+                Console.Write(Convert.ToChar(t[i]));
+                ASCIIEncoding asen = new ASCIIEncoding();
+                sock.Send(asen.GetBytes("The string was recieved by the server."));
+            }
+            Console.WriteLine(t.ToString()); //writes the received data to the console.
+ 
+        }
+        catch (SocketException e)
+        {
+            Console.WriteLine("Problem sending data");
+            Console.WriteLine(e.ToString());
+            sock.Close();
+            return;
+        }
+        sock.Close();  //closing the socket connection
+    }
+}
