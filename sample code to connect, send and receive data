@@ -1,3 +1,5 @@
+//this sample programs allows for ethernet based remote control via a console
+
 using System;
 using System.Net;  //declaration of namespaces that will be used in this program
 using System.Net.Sockets;
